@@ -18,10 +18,14 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,7 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import androidx.compose.ui.window.Dialog
 
 @Composable
 fun MainScreen(todoViewModel: TodoViewModel, onShareClick: () -> Unit) {
@@ -122,10 +126,9 @@ fun MainScreen(todoViewModel: TodoViewModel, onShareClick: () -> Unit) {
         }
     } else {
         // Entry Form Screen
-        EntryFormScreen(onNextClick = { showListScreen = true }, todoViewModel = todoViewModel)
+        EntryFormScreen(onDismiss = { showListScreen = true }, todoViewModel = todoViewModel)
     }
 }
-
 
 @Composable
 fun TodoItemRow(
@@ -169,6 +172,79 @@ fun TodoItemRow(
 
         IconButton(onClick = onRemoveClick) {
             Icon(Icons.Default.Delete, contentDescription = "Delete")
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EntryFormScreen(
+    onDismiss: () -> Unit,
+    onSave: (String, Double) -> Unit
+) {
+    var title by remember { mutableStateOf("") }
+    var amountText by remember { mutableStateOf("") }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.surface
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "Add New Expense",
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                TextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text("Title") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                TextField(
+                    value = amountText,
+                    onValueChange = { amountText = it },
+                    label = { Text("Amount (Rs)") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text("Cancel")
+                    }
+                    
+                    Spacer(modifier = Modifier.width(8.dp))
+                    
+                    Button(
+                        onClick = {
+                            val amount = amountText.toDoubleOrNull() ?: 0.0
+                            if (title.isNotBlank() && amount > 0) {
+                                onSave(title, amount)
+                            }
+                        }
+                    ) {
+                        Text("Save")
+                    }
+                }
+            }
         }
     }
 }

@@ -3,17 +3,13 @@ package com.example.kharchaji
 import kotlinx.coroutines.flow.Flow
 
 class TodoRepository(private val todoDao: TodoDao) {
-    fun getTodoItems(): Flow<List<TodoItem>> = todoDao.getTodoItems()
+    val allItems: Flow<List<TodoItem>> = todoDao.getAllItems()
 
-    suspend fun insert(todoItem: TodoItem) {
-        todoDao.insert(todoItem)
+    suspend fun insert(item: TodoItem) {
+        todoDao.insert(item)
     }
 
-    suspend fun update(todoItem: TodoItem) {
-        todoDao.update(todoItem)
-    }
-
-    suspend fun delete(todoItem: TodoItem) {
-        todoDao.delete(todoItem)
+    suspend fun delete(item: TodoItem) {
+        todoDao.delete(item)
     }
 }
